@@ -1,0 +1,11 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: simple-app
+  namespace: flux-system
+spec:
+  image: <<AWS Accaunt ID>>.dkr.ecr.<<AWS-Region>>.amazonaws.com/simple-app
+  interval: 1m0s
+  secretRef:
+    name: ecr-credentials

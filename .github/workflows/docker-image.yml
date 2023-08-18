@@ -1,0 +1,94 @@
+
+name: "Build and push to ECR"
+on:
+  # push:
+  #   branches:
+  #   - main
+   pull_request:
+env:
+  namespace: stage
+  cluster: simple-app-cluster
+
+jobs:
+
+  BuildAndPushImageToECR:
+    name: "Build and Push to ECR"
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: Docker metadata
+        id: metadata
+        uses: docker/metadata-action@v3
+        with:
+          images: simple-app
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value={{sha}},enable=${{ github.ref_type != 'tag' }}
+
+      - name: Minor version for each merge
+        id: taggerDryRun
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+    
+      - name: echo new tag
+        run: |
+          echo "The next tag version will be: ${{ steps.taggerDryRun.outputs.new_tag }}"
+      - name: echo tag
+        run: |
+          echo "The current tag is: ${{ steps.taggerDryRun.outputs.tag }}"
+      - name: echo part
+        run: |
+          echo "The version increment was: ${{ steps.taggerDryRun.outputs.part }}"
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR 🏷
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: "simple-app"
+          IMAGE_TAG: ${{ steps.taggerDryRun.outputs.tag }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
+  # deploy:
+  #   needs: [BuildAndPushImageToECR]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v2
+  #     - name: Create kube config
+  #       run: |
+  #         mkdir -p $HOME/.kube/
+  #         echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+  #         chmod 600 $HOME/.kube/config
+  #     - name: Install helm
+  #       run: |
+  #         curl -LO https://get.helm.sh/helm-v3.8.0-linux-amd64.tar.gz
+  #         tar -zxvf helm-v3.8.0-linux-amd64.tar.gz
+  #         mv linux-amd64/helm /usr/local/bin/helm
+  #         helm version
+  #     - name: Deploy
+  #       working-directory: ./helm-chart
+  #       run: |
+  #        helm upgrade --install --atomic python-simple-app \
+  #         --namespace=stage .chart \
+  #         --values stage.values.yaml \
+  #         --set image.tag=latest

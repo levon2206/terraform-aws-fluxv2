@@ -1,0 +1,26 @@
+{{- if (or .Values.metrics.enabled .Values.service.enabled) -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "simple-app.fullname" . }}
+  labels:
+    {{- include "simple-app.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+  {{- if .Values.service.enabled }}
+  - name: {{ .Values.service.port.name }}
+    port: {{ .Values.service.port.number }}
+    targetPort: {{ .Values.service.port.name }}
+    protocol: {{ .Values.service.port.protocol }}
+  {{- end }}
+  {{- if .Values.metrics.enabled }}
+  - name: {{ .Values.metrics.service.name }}
+    port: {{ .Values.metrics.service.port }}
+    protocol: {{ .Values.metrics.service.protocol }}
+    targetPort: {{ .Values.metrics.service.name }}
+  {{- end }}
+  selector:
+    {{- include "simple-app.selectorLabels" . | nindent 4 }}
+{{- end }}

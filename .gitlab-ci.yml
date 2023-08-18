@@ -1,0 +1,17 @@
+include:
+  - local: /.gitlab/infra.gitlab-ci.yml
+  - local: /.gitlab/app.gitlab-ci.yml
+
+variables:
+  TF_ROOT: ${CI_PROJECT_DIR}/rds-vpc-module
+  TF_STATE_NAME: simple-app
+  ANSIBLE_HOST_KEY_CHECKING: "false"
+  AWS_SHARED_CREDENTIALS_FILE: ${CI_PROJECT_DIR}/.aws
+  AWS_PROFILE: "simple-app"
+
+.merge_requst_common:
+  rules:
+    - if: $CI_COMMIT_BRANCH
+      when: manual
+    - if: $CI_MERGE_REQUEST_ID
+      when: never

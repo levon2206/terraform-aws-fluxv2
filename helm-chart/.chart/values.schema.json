@@ -1,0 +1,1165 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "replicaCount": 1,
+            "image": {
+                "registry": "411191840446.dkr.ecr.eu-central-1.amazonaws.com",
+                "repository": "group/subgroup/project",
+                "tag": "latest",
+                "pullPolicy": "Always"
+            },
+            "app": {
+                "command": [
+                    "/bin/sh"
+                ],
+                "args": [
+                    "-c",
+                    "sleep"
+                ]
+            },
+            "imagePullSecrets": [
+                {
+                    "name": "regcred"
+                }
+            ],
+            "nameOverride": "",
+            "fullnameOverride": "",
+            "serviceAccount": {
+                "create": false,
+                "annotations": {},
+                "name": "vault-auth"
+            },
+            "podAnnotations": {},
+            "podSecurityContext": {},
+            "securityContext": {},
+            "extraResources": [],
+            "service": {
+                "enabled": true,
+                "type": "ClusterIP",
+                "healthPath": "/healthz",
+                "healthPort": 7777,
+                "port": {
+                    "name": "http",
+                    "number": 8000,
+                    "protocol": "TCP"
+                }
+            },
+            "metrics": {
+                "enabled": false,
+                "service": {
+                    "port": 7777,
+                    "protocol": "TCP",
+                    "name": "metrics"
+                },
+                "serviceMonitor": {
+                    "enabled": false,
+                    "namespace": "monitoring",
+                    "interval": "20s",
+                    "scrapeTimeout": "10s",
+                    "path": "/metrics",
+                    "labels": {
+                        "release": "prometheus-operator"
+                    }
+                }
+            },
+            "ingress": {
+                "enabled": false,
+                "domains": [
+                    {
+                        "domain": {
+                            "host": "chart.example.com",
+                            "paths": [
+                                {
+                                    "path": "/",
+                                    "pathType": "Prefix"
+                                }
+                            ]
+                        },
+                        "annotations": {}
+                    }
+                ],
+                "tls": []
+            },
+            "resources": {
+                "requests": {
+                    "cpu": "10m",
+                    "memory": "10Mi"
+                },
+                "limits": {
+                    "cpu": "100m",
+                    "memory": "100Mi"
+                }
+            },
+            "autoscaling": {
+                "enabled": false,
+                "minReplicas": 1,
+                "maxReplicas": 3,
+                "targetCPUUtilizationPercentage": 80,
+                "targetMemoryUtilizationPercentage": 80
+            },
+            "nodeSelector": {},
+            "tolerations": [],
+            "affinity": {}
+        }
+    ],
+    "required": [
+        "replicaCount",
+        "image",
+        "imagePullSecrets",
+        "nameOverride",
+        "fullnameOverride",
+        "serviceAccount",
+        "podAnnotations",
+        "podSecurityContext",
+        "securityContext",
+        "service",
+        "metrics",
+        "ingress",
+        "resources",
+        "autoscaling",
+        "nodeSelector",
+        "tolerations",
+        "affinity"
+    ],
+    "properties": {
+        "replicaCount": {
+            "$id": "#/properties/replicaCount",
+            "type": "integer",
+            "title": "The replicaCount schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "image": {
+            "$id": "#/properties/image",
+            "type": "object",
+            "title": "The image schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "registry": "gitlab.maiv.biz:5050",
+                    "repository": "group/subgroup/project",
+                    "tag": "latest",
+                    "pullPolicy": "Always"
+                }
+            ],
+            "required": [
+                "registry",
+                "repository",
+                "tag",
+                "pullPolicy"
+            ],
+            "properties": {
+                "registry": {
+                    "$id": "#/properties/image/properties/registry",
+                    "type": "string",
+                    "title": "The registry schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "gitlab.maiv.biz:5050"
+                    ]
+                },
+                "repository": {
+                    "$id": "#/properties/image/properties/repository",
+                    "type": "string",
+                    "title": "The repository schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "group/subgroup/project"
+                    ]
+                },
+                "tag": {
+                    "$id": "#/properties/image/properties/tag",
+                    "type": ["string", "integer"],
+                    "title": "The tag schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "latest"
+                    ]
+                },
+                "pullPolicy": {
+                    "$id": "#/properties/image/properties/pullPolicy",
+                    "type": "string",
+                    "title": "The pullPolicy schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "Always"
+                    ]
+                }
+            },
+            "additionalProperties": true
+        },
+        "app": {
+            "$id": "#/properties/app",
+            "type": "object",
+            "title": "The app schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "command": [
+                        "/bin/sh"
+                    ],
+                    "args": [
+                        "-c",
+                        "sleep"
+                    ]
+                }
+            ],
+            "required": [],
+            "additionalProperties": true
+        },
+        "imagePullSecrets": {
+            "$id": "#/properties/imagePullSecrets",
+            "type": "array",
+            "title": "The imagePullSecrets schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "name": "regcred"
+                    }
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/imagePullSecrets/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/imagePullSecrets/items/anyOf/0",
+                        "type": "object",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": {},
+                        "examples": [
+                            {
+                                "name": "regcred"
+                            }
+                        ],
+                        "required": [
+                            "name"
+                        ],
+                        "properties": {
+                            "name": {
+                                "$id": "#/properties/imagePullSecrets/items/anyOf/0/properties/name",
+                                "type": "string",
+                                "title": "The name schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": "",
+                                "examples": [
+                                    "regcred"
+                                ]
+                            }
+                        },
+                        "additionalProperties": true
+                    }
+                ]
+            }
+        },
+        "nameOverride": {
+            "$id": "#/properties/nameOverride",
+            "type": "string",
+            "title": "The nameOverride schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                ""
+            ]
+        },
+        "fullnameOverride": {
+            "$id": "#/properties/fullnameOverride",
+            "type": "string",
+            "title": "The fullnameOverride schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                ""
+            ]
+        },
+        "serviceAccount": {
+            "$id": "#/properties/serviceAccount",
+            "type": "object",
+            "title": "The serviceAccount schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "create": false,
+                    "annotations": {},
+                    "name": "vault-auth"
+                }
+            ],
+            "required": [
+                "create",
+                "annotations",
+                "name"
+            ],
+            "properties": {
+                "create": {
+                    "$id": "#/properties/serviceAccount/properties/create",
+                    "type": "boolean",
+                    "title": "The create schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "annotations": {
+                    "$id": "#/properties/serviceAccount/properties/annotations",
+                    "type": "object",
+                    "title": "The annotations schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {}
+                    ],
+                    "required": [],
+                    "additionalProperties": true
+                },
+                "name": {
+                    "$id": "#/properties/serviceAccount/properties/name",
+                    "type": "string",
+                    "title": "The name schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "vault-auth"
+                    ]
+                }
+            },
+            "additionalProperties": true
+        },
+        "podAnnotations": {
+            "$id": "#/properties/podAnnotations",
+            "type": "object",
+            "title": "The podAnnotations schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {}
+            ],
+            "required": [],
+            "additionalProperties": true
+        },
+        "podSecurityContext": {
+            "$id": "#/properties/podSecurityContext",
+            "type": "object",
+            "title": "The podSecurityContext schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {}
+            ],
+            "required": [],
+            "additionalProperties": true
+        },
+        "securityContext": {
+            "$id": "#/properties/securityContext",
+            "type": "object",
+            "title": "The securityContext schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {}
+            ],
+            "required": [],
+            "additionalProperties": true
+        },
+        "extraResources": {
+            "$id": "#/properties/extraResources",
+            "type": "array",
+            "title": "The extraResources schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {}
+            ],
+            "required": [],
+            "additionalProperties": true
+        },
+        "service": {
+            "$id": "#/properties/service",
+            "type": "object",
+            "title": "The service schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "enabled": true,
+                    "type": "ClusterIP",
+                    "healthPath": "/healthz",
+                    "healthPort": 7777,
+                    "port": {
+                        "name": "http",
+                        "number": 8000,
+                        "protocol": "TCP"
+                    }
+                }
+            ],
+            "required": [
+                "enabled",
+                "type",
+                "healthPath",
+                "healthPort",
+                "port"
+            ],
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/service/properties/enabled",
+                    "type": "boolean",
+                    "title": "The enabled schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "type": {
+                    "$id": "#/properties/service/properties/type",
+                    "type": "string",
+                    "title": "The type schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "ClusterIP"
+                    ]
+                },
+                "healthPath": {
+                    "$id": "#/properties/service/properties/healthPath",
+                    "type": "string",
+                    "title": "The healthPath schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "/healthz"
+                    ]
+                },
+                "healthPort": {
+                    "$id": "#/properties/service/properties/healthPort",
+                    "type": "integer",
+                    "title": "The healthPort schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        7777
+                    ]
+                },
+                "port": {
+                    "$id": "#/properties/service/properties/port",
+                    "type": "object",
+                    "title": "The port schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "name": "http",
+                            "number": 8000,
+                            "protocol": "TCP"
+                        }
+                    ],
+                    "required": [
+                        "name",
+                        "number",
+                        "protocol"
+                    ],
+                    "properties": {
+                        "name": {
+                            "$id": "#/properties/service/properties/port/properties/name",
+                            "type": "string",
+                            "title": "The name schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "http"
+                            ]
+                        },
+                        "number": {
+                            "$id": "#/properties/service/properties/port/properties/number",
+                            "type": "integer",
+                            "title": "The number schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0,
+                            "examples": [
+                                8000
+                            ]
+                        },
+                        "protocol": {
+                            "$id": "#/properties/service/properties/port/properties/protocol",
+                            "type": "string",
+                            "title": "The protocol schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "TCP"
+                            ]
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "metrics": {
+            "$id": "#/properties/metrics",
+            "type": "object",
+            "title": "The metrics schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "enabled": false,
+                    "service": {
+                        "port": 7777,
+                        "protocol": "TCP",
+                        "name": "metrics"
+                    },
+                    "serviceMonitor": {
+                        "enabled": false,
+                        "namespace": "monitoring",
+                        "interval": "20s",
+                        "scrapeTimeout": "10s",
+                        "path": "/metrics",
+                        "labels": {
+                            "release": "prometheus-operator"
+                        }
+                    }
+                }
+            ],
+            "required": [
+                "enabled",
+                "service",
+                "serviceMonitor"
+            ],
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/metrics/properties/enabled",
+                    "type": "boolean",
+                    "title": "The enabled schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "service": {
+                    "$id": "#/properties/metrics/properties/service",
+                    "type": "object",
+                    "title": "The service schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "port": 7777,
+                            "protocol": "TCP",
+                            "name": "metrics"
+                        }
+                    ],
+                    "required": [
+                        "port",
+                        "protocol",
+                        "name"
+                    ],
+                    "properties": {
+                        "port": {
+                            "$id": "#/properties/metrics/properties/service/properties/port",
+                            "type": "integer",
+                            "title": "The port schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": 0,
+                            "examples": [
+                                7777
+                            ]
+                        },
+                        "protocol": {
+                            "$id": "#/properties/metrics/properties/service/properties/protocol",
+                            "type": "string",
+                            "title": "The protocol schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "TCP"
+                            ]
+                        },
+                        "name": {
+                            "$id": "#/properties/metrics/properties/service/properties/name",
+                            "type": "string",
+                            "title": "The name schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "metrics"
+                            ]
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "serviceMonitor": {
+                    "$id": "#/properties/metrics/properties/serviceMonitor",
+                    "type": "object",
+                    "title": "The serviceMonitor schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "enabled": false,
+                            "namespace": "monitoring",
+                            "interval": "20s",
+                            "scrapeTimeout": "10s",
+                            "path": "/metrics",
+                            "labels": {
+                                "release": "prometheus-operator"
+                            }
+                        }
+                    ],
+                    "required": [
+                        "enabled",
+                        "namespace",
+                        "interval",
+                        "scrapeTimeout",
+                        "path",
+                        "labels"
+                    ],
+                    "properties": {
+                        "enabled": {
+                            "$id": "#/properties/metrics/properties/serviceMonitor/properties/enabled",
+                            "type": "boolean",
+                            "title": "The enabled schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": false,
+                            "examples": [
+                                false
+                            ]
+                        },
+                        "namespace": {
+                            "$id": "#/properties/metrics/properties/serviceMonitor/properties/namespace",
+                            "type": "string",
+                            "title": "The namespace schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "monitoring"
+                            ]
+                        },
+                        "interval": {
+                            "$id": "#/properties/metrics/properties/serviceMonitor/properties/interval",
+                            "type": "string",
+                            "title": "The interval schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "20s"
+                            ]
+                        },
+                        "scrapeTimeout": {
+                            "$id": "#/properties/metrics/properties/serviceMonitor/properties/scrapeTimeout",
+                            "type": "string",
+                            "title": "The scrapeTimeout schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "10s"
+                            ]
+                        },
+                        "path": {
+                            "$id": "#/properties/metrics/properties/serviceMonitor/properties/path",
+                            "type": "string",
+                            "title": "The path schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "/metrics"
+                            ]
+                        },
+                        "labels": {
+                            "$id": "#/properties/metrics/properties/serviceMonitor/properties/labels",
+                            "type": "object",
+                            "title": "The labels schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "examples": [
+                                {
+                                    "release": "prometheus-operator"
+                                }
+                            ],
+                            "required": [],
+                            "properties": {
+                                "release": {
+                                    "$id": "#/properties/metrics/properties/serviceMonitor/properties/labels/properties/release",
+                                    "type": "string",
+                                    "title": "The release schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": "",
+                                    "examples": [
+                                        "prometheus-operator"
+                                    ]
+                                }
+                            },
+                            "additionalProperties": true
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "ingress": {
+            "$id": "#/properties/ingress",
+            "type": "object",
+            "title": "The ingress schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "enabled": false,
+                    "domains": [
+                        {
+                            "domain": {
+                                "host": "chart.example.com",
+                                "paths": [
+                                    {
+                                        "path": "/",
+                                        "pathType": "Prefix"
+                                    }
+                                ]
+                            },
+                            "annotations": {}
+                        }
+                    ],
+                    "tls": []
+                }
+            ],
+            "required": [
+                "enabled",
+                "domains",
+                "tls"
+            ],
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/ingress/properties/enabled",
+                    "type": "boolean",
+                    "title": "The enabled schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "domains": {
+                    "$id": "#/properties/ingress/properties/domains",
+                    "type": "array",
+                    "title": "The domains schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [
+                        [
+                            {
+                                "domain": {
+                                    "host": "chart.example.com",
+                                    "paths": [
+                                        {
+                                            "path": "/",
+                                            "pathType": "Prefix"
+                                        }
+                                    ]
+                                },
+                                "annotations": {}
+                            }
+                        ]
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/ingress/properties/domains/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/ingress/properties/domains/items/anyOf/0",
+                                "type": "object",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": {},
+                                "examples": [
+                                    {
+                                        "domain": {
+                                            "host": "chart.example.com",
+                                            "paths": [
+                                                {
+                                                    "path": "/",
+                                                    "pathType": "Prefix"
+                                                }
+                                            ]
+                                        },
+                                        "annotations": {}
+                                    }
+                                ],
+                                "required": [
+                                    "domain",
+                                    "annotations"
+                                ],
+                                "properties": {
+                                    "domain": {
+                                        "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/domain",
+                                        "type": "object",
+                                        "title": "The domain schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {
+                                                "host": "chart.example.com",
+                                                "paths": [
+                                                    {
+                                                        "path": "/",
+                                                        "pathType": "Prefix"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "required": [
+                                            "host",
+                                            "paths"
+                                        ],
+                                        "properties": {
+                                            "host": {
+                                                "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/domain/properties/host",
+                                                "type": "string",
+                                                "title": "The host schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": "",
+                                                "examples": [
+                                                    "chart.example.com"
+                                                ]
+                                            },
+                                            "paths": {
+                                                "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/domain/properties/paths",
+                                                "type": "array",
+                                                "title": "The paths schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "examples": [
+                                                    [
+                                                        {
+                                                            "path": "/",
+                                                            "pathType": "Prefix"
+                                                        }
+                                                    ]
+                                                ],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/domain/properties/paths/items",
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/domain/properties/paths/items/anyOf/0",
+                                                            "type": "object",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": {},
+                                                            "examples": [
+                                                                {
+                                                                    "path": "/",
+                                                                    "pathType": "Prefix"
+                                                                }
+                                                            ],
+                                                            "required": [
+                                                                "path",
+                                                                "pathType"
+                                                            ],
+                                                            "properties": {
+                                                                "path": {
+                                                                    "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/domain/properties/paths/items/anyOf/0/properties/path",
+                                                                    "type": "string",
+                                                                    "title": "The path schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "default": "",
+                                                                    "examples": [
+                                                                        "/"
+                                                                    ]
+                                                                },
+                                                                "pathType": {
+                                                                    "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/domain/properties/paths/items/anyOf/0/properties/pathType",
+                                                                    "type": "string",
+                                                                    "title": "The pathType schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "default": "",
+                                                                    "examples": [
+                                                                        "Prefix"
+                                                                    ]
+                                                                }
+                                                            },
+                                                            "additionalProperties": true
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "additionalProperties": true
+                                    },
+                                    "annotations": {
+                                        "$id": "#/properties/ingress/properties/domains/items/anyOf/0/properties/annotations",
+                                        "type": "object",
+                                        "title": "The annotations schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "examples": [
+                                            {}
+                                        ],
+                                        "required": [],
+                                        "additionalProperties": true
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        ]
+                    }
+                },
+                "tls": {
+                    "$id": "#/properties/ingress/properties/tls",
+                    "type": "array",
+                    "title": "The tls schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "examples": [
+                        []
+                    ],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/ingress/properties/tls/items"
+                    }
+                }
+            },
+            "additionalProperties": true
+        },
+        "resources": {
+            "$id": "#/properties/resources",
+            "type": "object",
+            "title": "The resources schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "requests": {
+                        "cpu": "10m",
+                        "memory": "10Mi"
+                    },
+                    "limits": {
+                        "cpu": "100m",
+                        "memory": "100Mi"
+                    }
+                }
+            ],
+            "required": [
+                "requests",
+                "limits"
+            ],
+            "properties": {
+                "requests": {
+                    "$id": "#/properties/resources/properties/requests",
+                    "type": "object",
+                    "title": "The requests schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "cpu": "10m",
+                            "memory": "10Mi"
+                        }
+                    ],
+                    "required": [
+                        "cpu",
+                        "memory"
+                    ],
+                    "properties": {
+                        "cpu": {
+                            "$id": "#/properties/resources/properties/requests/properties/cpu",
+                            "type": "string",
+                            "title": "The cpu schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "10m"
+                            ]
+                        },
+                        "memory": {
+                            "$id": "#/properties/resources/properties/requests/properties/memory",
+                            "type": "string",
+                            "title": "The memory schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "10Mi"
+                            ]
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "limits": {
+                    "$id": "#/properties/resources/properties/limits",
+                    "type": "object",
+                    "title": "The limits schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "examples": [
+                        {
+                            "cpu": "100m",
+                            "memory": "100Mi"
+                        }
+                    ],
+                    "required": [
+                        "cpu",
+                        "memory"
+                    ],
+                    "properties": {
+                        "cpu": {
+                            "$id": "#/properties/resources/properties/limits/properties/cpu",
+                            "type": "string",
+                            "title": "The cpu schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "100m"
+                            ]
+                        },
+                        "memory": {
+                            "$id": "#/properties/resources/properties/limits/properties/memory",
+                            "type": "string",
+                            "title": "The memory schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": "",
+                            "examples": [
+                                "100Mi"
+                            ]
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "autoscaling": {
+            "$id": "#/properties/autoscaling",
+            "type": "object",
+            "title": "The autoscaling schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "enabled": false,
+                    "minReplicas": 1,
+                    "maxReplicas": 3,
+                    "targetCPUUtilizationPercentage": 80,
+                    "targetMemoryUtilizationPercentage": 80
+                }
+            ],
+            "required": [
+                "enabled",
+                "minReplicas",
+                "maxReplicas",
+                "targetCPUUtilizationPercentage",
+                "targetMemoryUtilizationPercentage"
+            ],
+            "properties": {
+                "enabled": {
+                    "$id": "#/properties/autoscaling/properties/enabled",
+                    "type": "boolean",
+                    "title": "The enabled schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": false,
+                    "examples": [
+                        false
+                    ]
+                },
+                "minReplicas": {
+                    "$id": "#/properties/autoscaling/properties/minReplicas",
+                    "type": "integer",
+                    "title": "The minReplicas schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        1
+                    ]
+                },
+                "maxReplicas": {
+                    "$id": "#/properties/autoscaling/properties/maxReplicas",
+                    "type": "integer",
+                    "title": "The maxReplicas schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        3
+                    ]
+                },
+                "targetCPUUtilizationPercentage": {
+                    "$id": "#/properties/autoscaling/properties/targetCPUUtilizationPercentage",
+                    "type": "integer",
+                    "title": "The targetCPUUtilizationPercentage schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        80
+                    ]
+                },
+                "targetMemoryUtilizationPercentage": {
+                    "$id": "#/properties/autoscaling/properties/targetMemoryUtilizationPercentage",
+                    "type": "integer",
+                    "title": "The targetMemoryUtilizationPercentage schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0,
+                    "examples": [
+                        80
+                    ]
+                }
+            },
+            "additionalProperties": true
+        },
+        "nodeSelector": {
+            "$id": "#/properties/nodeSelector",
+            "type": "object",
+            "title": "The nodeSelector schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {}
+            ],
+            "required": [],
+            "additionalProperties": true
+        },
+        "tolerations": {
+            "$id": "#/properties/tolerations",
+            "type": "array",
+            "title": "The tolerations schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                []
+            ],
+            "additionalItems": true,
+            "items": {
+                "$id": "#/properties/tolerations/items"
+            }
+        },
+        "affinity": {
+            "$id": "#/properties/affinity",
+            "type": "object",
+            "title": "The affinity schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {}
+            ],
+            "required": [],
+            "additionalProperties": true
+        }
+    },
+    "additionalProperties": true
+}

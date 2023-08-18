@@ -1,0 +1,74 @@
+stages:
+  - terraform-init-plan
+  - terraform-apply
+  - terraform-output
+
+before_script:
+  - cp $AWS_CREDENTIALS ${CI_PROJECT_DIR}/.aws ##AWS Profile credentials
+
+default:
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  cache:
+    key: terraform
+    paths:
+      - ${TF_ROOT}/.terraform
+
+T-Init-plan-EKS-VPC:
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  stage: terraform-init-plan
+  extends:
+    - .merge_requst_common
+  environment:
+    name: dev
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform init
+    - gitlab-terraform validate
+    - gitlab-terraform plan
+    - gitlab-terraform plan-json
+  artifacts:
+    name: plan
+    expire_in: 3 week
+    paths:
+      - ${TF_ROOT}/plan.cache
+    reports:
+      terraform: ${TF_ROOT}/plan.json
+
+T-Apply-EKS-VPC:
+  stage: terraform-apply
+  image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+  extends:
+    - .merge_requst_common
+  environment:
+    name: dev
+  script:
+    - cd ${TF_ROOT}
+    - gitlab-terraform apply
+  dependencies:
+    - T-Init-plan-EKS-VPC
+  needs:
+    - T-Init-plan-EKS-VPC
+  when: manual
+# T-Outputs-RDS-VPC:
+#   stage: terraform-output
+#   image: registry.gitlab.com/gitlab-org/terraform-images/stable:latest
+#   extends:
+#     - .merge_requst_common
+#   environment:
+#     name: dev
+#   script:
+#     - cd ${TF_ROOT}
+#     - gitlab-terraform init
+#     - echo VPC_ID=$( gitlab-terraform  output -json  vpc-id | jq -r '.') > $CI_PROJECT_DIR/VPC-ID
+#     - echo PRIVATE_IP=$( gitlab-terraform  output -json  private-subnet-ids | jq -r '.') > $CI_PROJECT_DIR/PRIVATE-IP
+#   artifacts:
+#     paths:
+#       - $CI_PROJECT_DIR/VPC-ID
+#       - $CI_PROJECT_DIR/PRIVATE-IP
+#     expire_in: 1 week
+#   dependencies:
+#     - T-Init-plan-EKS-VPC
+#   needs:
+#     - T-Init-plan-EKS-VPC
+#   when: manual
+

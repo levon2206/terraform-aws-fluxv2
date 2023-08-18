@@ -1,0 +1,81 @@
+# Source: simple-app/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-app
+  namespace: stage
+  labels:
+    helm.sh/chart: simple-app-0.1.0
+    app.kubernetes.io/name: simple-app
+    app.kubernetes.io/instance: simple-app
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: simple-app
+      app.kubernetes.io/instance: simple-app
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        timestamp: "2023-08-05 21:40:14.981763 +0400 +04 m=+0.032756168"
+      labels:
+        app.kubernetes.io/name: simple-app
+        app.kubernetes.io/instance: simple-app
+    spec:
+      serviceAccountName: default
+      securityContext: {}
+      containers:
+        - name: app
+          securityContext: {}
+          image: "<<AWS-ACCaunt-ID>>.dkr.ecr.<<AWS-Region>>.amazonaws.com/simple-app:v0.2.0-beta.5" # {"$imagepolicy": "flux-system:simple-app"}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: HEALTH_ENDPOINT
+              value: /health
+            - name: HEALTH_PORT
+              value: "8080"
+            - name: HTTP_PORT
+              value: "8080"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            limits:
+              cpu: 100m
+              memory: 50Mi
+            requests:
+              cpu: 10m
+              memory: 10Mi

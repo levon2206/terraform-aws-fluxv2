@@ -1,0 +1,46 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "simple-app.fullname" . -}}
+{{- $svcPortName := .Values.service.port.name -}}
+{{- range $index, $element := .Values.ingress.domains }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ printf "%s-%v" $.Release.Name $index }}
+  labels:
+    {{- include "simple-app.labels" $ | nindent 4 }}
+  {{- with $element.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with $element.ingressClassName }} 
+  ingressClassName: {{ $element.ingressClassName }}
+  {{- else }}
+  ingressClassName: {{ $.Values.ingress.ingressClassName }}
+{{- end }}
+  {{- if $.Values.ingress.tls }}
+  tls:
+    {{- range $.Values.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ $element.domain.host }}
+      http:
+        paths:
+          {{- range $element.domain.paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  name: {{ $svcPortName }}
+          {{- end }}
+    {{- end }}
+  {{- end }}

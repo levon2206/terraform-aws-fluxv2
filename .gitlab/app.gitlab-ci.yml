@@ -1,0 +1,43 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  GIT_STRATEGY: clone
+  CHART_PATH: .chart/
+  DOCKER_REGISTRY: <<aws-accaunt-id>>.dkr.ecr.<<aws-region>>.amazonaws.com
+  AWS_DEFAULT_REGION: eu-central-1
+  APP_NAME: simple-app
+  DOCKER_HOST: tcp://docker:2375
+
+before_script:
+  - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+
+build:
+  image:
+    name: amazon/aws-cli
+    entrypoint: [""]
+  services:
+    - docker:dind
+  before_script:
+    - amazon-linux-extras install docker
+    - aws --version
+    - docker --version
+  script:
+    - docker build -t $DOCKER_REGISTRY/$APP_NAME:$CI_PIPELINE_IID .
+    - aws ecr get-login-password | docker login --username AWS --password-stdin $DOCKER_REGISTRY
+    - docker push $DOCKER_REGISTRY/$APP_NAME:$CI_PIPELINE_IID
+
+deploy:
+  image: infrastructuregr/eks-helm
+  variables:
+    RELEASE_NAME: ${CI_PROJECT_NAME}
+    EXTRA_HELM_ARGS: --atomic
+    KUBE_NAMESPACE: stage
+  stage: deploy
+  script: helm upgrade --install --atomic ${CI_PROJECT_NAME} \
+    --namespace=${KUBE_NAMESPACE}  ./helm-chart/${CHART_PATH} \
+    --set image.tag=${IMAGE_TAG} \
+    --values ./helm-chart/stage.values.yaml
+  environment:
+    name: stage

@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "simple-app.fullname" . }}
+  labels:
+    {{- include "simple-app.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "simple-app.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        timestamp: {{ now | quote }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "simple-app.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "simple-app.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.initContainers }}
+      initContainers:
+      {{- if eq "string" (printf "%T" .Values.initContainers) }}
+{{ tpl .Values.initContainers . | indent 6 }}
+      {{- else }}
+{{ toYaml .Values.initContainers | indent 6 }}
+      {{- end }}
+      {{- end }}
+      containers:
+        - name: app
+          {{- if .Values.app }}
+          command:
+          {{- range .Values.app.command }}
+            - {{ . }}
+          {{- end }}
+          args:          
+          {{- range .Values.app.args }}
+            - {{ . }}
+          {{- end }}
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}" # {"$imagepolicy": "flux-system:simple-app"}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: HEALTH_ENDPOINT
+            value: {{ .Values.service.healthPath }}
+          - name: HEALTH_PORT
+            value: {{ .Values.service.healthPort | quote }}
+          {{- if .Values.service.enabled }}
+          - name: HTTP_PORT
+            value: {{ .Values.service.port.number | quote }}
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
+          - name: METRICS_PORT
+            value: {{ .Values.metrics.service.port | quote }}
+          {{- end }}
+          ports:
+            {{- if .Values.service.enabled }}
+            - name: {{ .Values.service.port.name }}
+              containerPort: {{ .Values.service.port.number }}
+              protocol: {{ .Values.service.port.protocol }}
+            {{- end }}
+            {{- if .Values.metrics.enabled }}
+            - containerPort: {{ .Values.metrics.service.port }}
+              name: {{ .Values.metrics.service.name }}
+              protocol: {{ .Values.metrics.service.protocol }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.service.healthPath }}
+              port: {{ .Values.service.healthPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.service.healthPath }}
+              port: {{ .Values.service.healthPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

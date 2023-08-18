@@ -1,0 +1,23 @@
+---
+# Source: simple-app/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: simple-app
+  namespace: stage
+  labels:
+    helm.sh/chart: simple-app-0.1.0
+    app.kubernetes.io/name: simple-app
+    app.kubernetes.io/instance: simple-app
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+  selector:
+    app.kubernetes.io/name: simple-app
+    app.kubernetes.io/instance: simple-app
