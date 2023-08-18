@@ -1,6 +1,6 @@
 # DevOps Automation project
-- Setup AWS-EKS-ECR use Terraform
-- Deploy Python simple app use Helm chart
+- Setup AWS-EKS-ECR use Terraform.
+- Deploy Python simple app use Helm chart.
 - Use FluxV2 to automate kuberenets deployment image update from ECR registtry.
 
 ## Required Packages
