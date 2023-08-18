@@ -7,7 +7,7 @@
 
  - [terraform](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
  - [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
- - [eksctl](https://www.google.com/search?client=firefox-b-d&q=install+eksctl)
+ - [eksctl](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)
  - [flux](https://fluxcd.io/flux/cmd/)
 
 ## Usage
